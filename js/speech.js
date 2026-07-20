@@ -18,7 +18,34 @@ window.Speech = {
     }
   },
 
-  speak(text, lang = 'it-IT', rate = 0.85) {
+  // Best-effort name lists for classifying voices by gender, since the Web
+  // Speech API doesn't expose gender as metadata. Covers the common Italian
+  // voice names shipped by Chrome/Edge (Google) and Safari/iOS.
+  voiceNameHints: {
+    female: ['federica', 'alice', 'elsa', 'paola', 'isabella', 'valentina', 'female', 'donna', 'zira', 'samantha'],
+    male: ['luca', 'diego', 'niccolò', 'niccolo', 'cosimo', 'giorgio', 'male', 'uomo', 'daniel', 'alex']
+  },
+
+  getPreferredVoice(lang = 'it-IT') {
+    const voices = window.speechSynthesis.getVoices();
+    const langPrefix = lang.substring(0, 2).toLowerCase();
+    const matching = voices.filter(v => v.lang.toLowerCase().startsWith(langPrefix));
+    if (!matching.length) return null;
+
+    const gender = (window.Storage && Storage.getProgress().settings.voiceGender) || 'female';
+    if (gender === 'auto') return matching[0];
+
+    const hints = this.voiceNameHints[gender] || [];
+    const byName = matching.find(v => hints.some(h => v.name.toLowerCase().includes(h)));
+    if (byName) return byName;
+
+    // No name match: fall back to alternating so "male" and "female"
+    // at least tend to pick different voices when several are available.
+    if (gender === 'male' && matching.length > 1) return matching[1];
+    return matching[0];
+  },
+
+  speak(text, lang = 'it-IT', rate = null) {
     return new Promise((resolve, reject) => {
       if (!this.supported.tts) {
         console.warn('TTS not supported');
@@ -30,10 +57,9 @@ window.Speech = {
       
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
-      utterance.rate = rate;
+      utterance.rate = rate !== null ? rate : ((window.Storage && Storage.getProgress().settings.speechRate) || 0.85);
       
-      let voices = window.speechSynthesis.getVoices();
-      let targetVoice = voices.find(v => v.lang === lang || v.lang.startsWith(lang.substring(0, 2)));
+      const targetVoice = this.getPreferredVoice(lang);
       if (targetVoice) {
         utterance.voice = targetVoice;
       }
@@ -54,7 +80,8 @@ window.Speech = {
   },
   
   speakSlow(text) {
-    return this.speak(text, 'it-IT', 0.6);
+    const slowRate = ((window.Storage && Storage.getProgress().settings.speechRate) || 0.85) * 0.7;
+    return this.speak(text, 'it-IT', slowRate);
   },
   
   startRecognition(targetLang = 'it-IT') {

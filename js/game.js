@@ -92,6 +92,12 @@ window.Game = {
     }
   },
   
+  skipToDay(dayId) {
+    const progress = Storage.skipToDay(dayId);
+    this.checkBadgeConditions();
+    return progress;
+  },
+  
   canAccessDay(dayId) {
     if (dayId === 1) return true;
     const progress = Storage.getProgress();

@@ -3,18 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="description" content="Ciao Italia! - Aprende italiano en 30 días con ejercicios interactivos, pronunciación AI, mapa de Italia y mucho más.">
+  <meta name="description" content="Ciao Irene! - Tu app personal para aprender italiano en 30 días, con ejercicios interactivos, pronunciación AI y mapa de Italia. Hecha con cariño para ti.">
   <meta name="theme-color" content="#0F0F1A">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Ciao Italia!">
+  <meta name="apple-mobile-web-app-title" content="Ciao Irene">
   
   <!-- Open Graph -->
-  <meta property="og:title" content="Ciao Italia! - Aprende Italiano en 30 Días">
-  <meta property="og:description" content="App interactiva para aprender italiano con AI, mapa de Italia, juegos y cultura.">
+  <meta property="og:title" content="Ciao Irene! - Aprende Italiano en 30 Días">
+  <meta property="og:description" content="App interactiva y personal para aprender italiano con AI, mapa de Italia, juegos y cultura.">
   <meta property="og:type" content="website">
   
-  <title>Ciao Italia! 🇮🇹 Aprende Italiano en 30 Días</title>
+  <title>Ciao Irene! 🇮🇹 Aprende Italiano en 30 Días</title>
+
+  <link rel="icon" type="image/svg+xml" href="img/logo.svg">
+  <link rel="apple-touch-icon" href="img/logo.svg">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,6 +28,11 @@
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
+
+  <header id="top-bar">
+    <img src="img/logo.svg" alt="Ciao Irene" class="app-logo">
+    <span class="app-title">Ciao Irene</span>
+  </header>
 
   <div id="app">
     <!-- Views -->
@@ -58,9 +66,9 @@
   <!-- Onboarding Overlay -->
   <div id="onboarding">
     <div class="modal glass-card">
-      <div style="font-size:4rem;margin-bottom:16px;">🇮🇹</div>
-      <h2>¡Benvenuta a Ciao Italia!</h2>
-      <p style="margin-bottom:12px;">Aprende italiano en <strong>30 días</strong> explorando la cultura, la comida y la música de Italia.</p>
+      <img src="img/logo.svg" alt="Ciao Irene" style="width:120px;height:120px;margin-bottom:16px;">
+      <h2>¡Benvenuta, Irene!</h2>
+      <p style="margin-bottom:12px;">Esta es tu app personal para aprender italiano en <strong>30 días</strong>, explorando la cultura, la comida y la música de Italia.</p>
       <div style="display:flex;gap:12px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;">
         <span style="background:rgba(27,107,58,0.2);padding:6px 14px;border-radius:20px;font-size:0.85rem;">🎤 Pronunciación AI</span>
         <span style="background:rgba(198,40,40,0.2);padding:6px 14px;border-radius:20px;font-size:0.85rem;">🗺️ Mapa Interactivo</span>
@@ -77,6 +85,9 @@
   
   <!-- Confetti Container -->
   <div id="confetti-container"></div>
+
+  <!-- Toast Container -->
+  <div id="toast-container"></div>
 
   <!-- Scripts -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>

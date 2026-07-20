@@ -15,8 +15,13 @@ window.Storage = {
       return defaultValue;
     }
   },
+  defaultSettings: {
+    hasSeenOnboarding: false,
+    voiceGender: 'female',
+    speechRate: 0.85
+  },
   getProgress() {
-    return this.load('progress', {
+    const progress = this.load('progress', {
       completedDays: [],
       currentDay: 1,
       xp: 0,
@@ -27,6 +32,10 @@ window.Storage = {
       exerciseResults: {},
       settings: {}
     });
+    // Fill in any settings added after this progress was first saved,
+    // without touching values Irene already chose.
+    progress.settings = Object.assign({}, this.defaultSettings, progress.settings || {});
+    return progress;
   },
   saveProgress(progress) {
     this.save('progress', progress);
@@ -68,5 +77,29 @@ window.Storage = {
   },
   resetProgress() {
     localStorage.removeItem('ciaoItalia_progress');
+  },
+  // Recovery tool: if the browser wipes localStorage (or Irene just wants to
+  // jump back to where she was), this restores currentDay/completedDays/
+  // unlockedLocations without requiring her to replay every exercise.
+  skipToDay(dayId) {
+    const progress = this.getProgress();
+    const target = Math.max(1, Math.min(30, parseInt(dayId, 10) || 1));
+
+    progress.currentDay = target;
+    for (let d = 1; d < target; d++) {
+      if (!progress.completedDays.includes(d)) progress.completedDays.push(d);
+    }
+    if (window.CiaoData && window.CiaoData.locations) {
+      window.CiaoData.locations
+        .filter(loc => loc.unlockedByDay <= target)
+        .forEach(loc => {
+          if (!progress.unlockedLocations.includes(loc.id)) {
+            progress.unlockedLocations.push(loc.id);
+          }
+        });
+    }
+
+    this.saveProgress(progress);
+    return progress;
   }
 };

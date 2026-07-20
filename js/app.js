@@ -79,7 +79,7 @@ window.App = {
 
     document.getElementById('home-view').innerHTML = `
       <div class="header-content">
-        <h1>¡Ciao! 👋</h1>
+        <h1>¡Ciao, Irene! 👋</h1>
         <div class="stats-row">
           <div class="stat-pill"><span class="icon">🔥</span> ${progress.streak} días</div>
           <div class="stat-pill"><span class="icon">🎓</span> Lvl ${levelInfo.level}</div>
@@ -540,29 +540,112 @@ window.App = {
   },
 
   renderSettingsView() {
+    const progress = Storage.getProgress();
+    const settings = progress.settings;
+
     document.getElementById('settings-view').innerHTML = `
       <h2>Ajustes</h2>
+
       <div class="card mt-2">
-        <h3>Voz</h3>
-        <p class="text-small mb-2">Velocidad de pronunciación por defecto</p>
-        <input type="range" id="speech-rate" min="0.5" max="1.5" step="0.1" value="0.85">
-        
-        <h3 class="mt-4">Datos</h3>
+        <h3>🎙️ Voz</h3>
+        <p class="text-small mb-2">Elige cómo suena la pronunciación en italiano.</p>
+
+        <div class="segmented-control" id="voice-gender-control">
+          <button class="segment ${settings.voiceGender === 'female' ? 'active' : ''}" data-gender="female">👩 Femenina</button>
+          <button class="segment ${settings.voiceGender === 'male' ? 'active' : ''}" data-gender="male">👨 Masculina</button>
+          <button class="segment ${settings.voiceGender === 'auto' ? 'active' : ''}" data-gender="auto">🔀 Automática</button>
+        </div>
+
+        <p class="text-small mt-4 mb-1">Velocidad: <strong id="speech-rate-value">${settings.speechRate.toFixed(2)}x</strong></p>
+        <input type="range" id="speech-rate" min="0.5" max="1.5" step="0.05" value="${settings.speechRate}">
+
+        <button class="btn outline full-width mt-4" onclick="App.testVoice()">🔊 Escuchar ejemplo</button>
+      </div>
+
+      <div class="card mt-2">
+        <h3>🧭 Recuperar Progreso</h3>
+        <p class="text-small mb-2">Si la app se reinicia sola o cambias de navegador, salta directamente al día en el que ibas sin repetir los ejercicios ya hechos.</p>
+        <div class="skip-day-row">
+          <input type="number" id="skip-day-input" min="1" max="30" value="${progress.currentDay}">
+          <button class="btn primary full-width" onclick="App.confirmSkipToDay()">Saltar a este día</button>
+        </div>
+      </div>
+
+      <div class="card mt-2">
+        <h3>💾 Copia de Seguridad</h3>
+        <p class="text-small mb-2">Exporta tu progreso de vez en cuando por si el navegador borra tus datos guardados.</p>
         <button class="btn outline full-width mb-2" onclick="App.exportData()">Exportar Progreso</button>
-        <button class="btn outline full-width mb-4" onclick="document.getElementById('import-file').click()">Importar Progreso</button>
+        <button class="btn outline full-width" onclick="document.getElementById('import-file').click()">Importar Progreso</button>
         <input type="file" id="import-file" style="display:none" onchange="App.importData(event)" accept=".json">
-        
+      </div>
+
+      <div class="card mt-2">
+        <h3>⚠️ Zona de Peligro</h3>
         <button class="btn outline danger full-width" onclick="App.resetData()">Borrar Todo el Progreso</button>
       </div>
+
+      <div class="about-footer">
+        <img src="img/logo.svg" alt="Ciao Irene" class="about-logo">
+        <p class="text-small">Ciao Irene · Hecho con ❤️ para ti</p>
+      </div>
     `;
+
+    const rateInput = document.getElementById('speech-rate');
+    rateInput.addEventListener('input', (e) => {
+      document.getElementById('speech-rate-value').innerText = parseFloat(e.target.value).toFixed(2) + 'x';
+    });
+    rateInput.addEventListener('change', (e) => {
+      App.updateSpeechRate(parseFloat(e.target.value));
+    });
+
+    document.querySelectorAll('#voice-gender-control .segment').forEach(btn => {
+      btn.addEventListener('click', () => App.setVoiceGender(btn.dataset.gender));
+    });
+  },
+
+  setVoiceGender(gender) {
+    const progress = Storage.getProgress();
+    progress.settings.voiceGender = gender;
+    Storage.saveProgress(progress);
+    this.renderSettingsView();
+  },
+
+  updateSpeechRate(rate) {
+    const progress = Storage.getProgress();
+    progress.settings.speechRate = rate;
+    Storage.saveProgress(progress);
+  },
+
+  testVoice() {
+    Speech.speak('Ciao Irene, come va oggi?');
+  },
+
+  confirmSkipToDay() {
+    const input = document.getElementById('skip-day-input');
+    const day = parseInt(input.value, 10);
+    if (!day || day < 1 || day > 30) {
+      this.showToast('Elige un día entre 1 y 30', 'error');
+      return;
+    }
+    this.showConfirm(
+      `¿Saltar al Día ${day}?`,
+      `Esto marcará los días 1 a ${day - 1} como completados y desbloqueará los lugares del mapa correspondientes. Tu XP e insignias no se pierden.`,
+      () => {
+        Game.skipToDay(day);
+        this.showToast(`¡Listo! Ahora estás en el Día ${day} 🎉`);
+        if (this.currentView === 'settings') this.renderSettingsView();
+      },
+      'Sí, saltar'
+    );
   },
 
   exportData() {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(Storage.exportProgress());
     const dlAnchorElem = document.createElement('a');
     dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", "ciao_italia_backup.json");
+    dlAnchorElem.setAttribute("download", "ciao_irene_backup.json");
     dlAnchorElem.click();
+    this.showToast('Progreso exportado');
   },
 
   importData(event) {
@@ -571,10 +654,10 @@ window.App = {
       const reader = new FileReader();
       reader.onload = (e) => {
         if (Storage.importProgress(e.target.result)) {
-          alert('Progreso importado con éxito');
-          window.location.reload();
+          this.showToast('Progreso importado con éxito');
+          setTimeout(() => window.location.reload(), 1200);
         } else {
-          alert('Error al importar el archivo');
+          this.showToast('Error al importar el archivo', 'error');
         }
       };
       reader.readAsText(file);
@@ -582,10 +665,59 @@ window.App = {
   },
 
   resetData() {
-    if (confirm('¿Estás seguro de que quieres borrar todo tu progreso? Esta acción no se puede deshacer.')) {
-      Storage.resetProgress();
-      window.location.reload();
-    }
+    this.showConfirm(
+      '¿Borrar todo el progreso?',
+      'Esta acción no se puede deshacer. Perderás días completados, XP, racha e insignias.',
+      () => {
+        Storage.resetProgress();
+        window.location.reload();
+      },
+      'Sí, borrar todo',
+      true
+    );
+  },
+
+  // Lightweight confirm modal, replacing the native confirm() dialog.
+  showConfirm(title, text, onConfirm, confirmLabel = 'Confirmar', danger = false) {
+    const overlay = document.getElementById('modal-overlay');
+    if (!overlay) return;
+
+    overlay.innerHTML = `
+      <div class="modal glass-card">
+        <h2>${title}</h2>
+        <p>${text}</p>
+        <div class="modal-actions">
+          <button class="btn outline full-width" id="modal-cancel-btn">Cancelar</button>
+          <button class="btn ${danger ? 'outline danger' : 'primary'} full-width" id="modal-confirm-btn">${confirmLabel}</button>
+        </div>
+      </div>
+    `;
+    overlay.classList.add('active');
+
+    document.getElementById('modal-cancel-btn').onclick = () => {
+      overlay.classList.remove('active');
+    };
+    document.getElementById('modal-confirm-btn').onclick = () => {
+      overlay.classList.remove('active');
+      onConfirm();
+    };
+  },
+
+  // Lightweight toast, replacing the native alert() dialog.
+  showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+    container.appendChild(toast);
+
+    requestAnimationFrame(() => toast.classList.add('visible'));
+    setTimeout(() => {
+      toast.classList.remove('visible');
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
   },
 
   dismissOnboarding() {

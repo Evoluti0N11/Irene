@@ -1,0 +1,63 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ciao Irene">
+  <defs>
+    <path id="arcTop" d="M 38 108 A 62 62 0 0 1 162 108" />
+    <path id="arcBottom" d="M 156 128 A 62 62 0 0 1 44 128" />
+    <radialGradient id="bgGlow" cx="50%" cy="38%" r="75%">
+      <stop offset="0%" stop-color="#252540"/>
+      <stop offset="100%" stop-color="#0F0F1A"/>
+    </radialGradient>
+    <linearGradient id="starGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD54F"/>
+      <stop offset="100%" stop-color="#FFB300"/>
+    </linearGradient>
+  </defs>
+
+  <!-- outer ring: thin Italian tricolor band -->
+  <g>
+    <clipPath id="ringClip">
+      <circle cx="100" cy="100" r="97"/>
+    </clipPath>
+    <g clip-path="url(#ringClip)">
+      <rect x="3" y="3" width="65" height="194" fill="#1B6B3A"/>
+      <rect x="68" y="3" width="64" height="194" fill="#FFFFFF"/>
+      <rect x="132" y="3" width="65" height="194" fill="#C62828"/>
+    </g>
+  </g>
+
+  <!-- main navy disc -->
+  <circle cx="100" cy="100" r="84" fill="url(#bgGlow)" stroke="#FFB300" stroke-width="2.5"/>
+  <circle cx="100" cy="100" r="78" fill="none" stroke="#FFB300" stroke-width="1" stroke-dasharray="1.5 4" opacity="0.6"/>
+
+  <!-- laurel branches -->
+  <g fill="none" stroke="#FFB300" stroke-width="2.4" stroke-linecap="round">
+    <path d="M 62 152 C 52 142, 48 128, 50 112"/>
+    <path d="M 138 152 C 148 142, 152 128, 150 112"/>
+  </g>
+  <g fill="#FFB300">
+    <ellipse cx="51" cy="140" rx="6" ry="3.2" transform="rotate(-25 51 140)"/>
+    <ellipse cx="48" cy="128" rx="6" ry="3.2" transform="rotate(-50 48 128)"/>
+    <ellipse cx="49" cy="116" rx="5.5" ry="3" transform="rotate(-75 49 116)"/>
+    <ellipse cx="60" cy="150" rx="5.5" ry="3" transform="rotate(5 60 150)"/>
+
+    <ellipse cx="149" cy="140" rx="6" ry="3.2" transform="rotate(25 149 140)"/>
+    <ellipse cx="152" cy="128" rx="6" ry="3.2" transform="rotate(50 152 128)"/>
+    <ellipse cx="151" cy="116" rx="5.5" ry="3" transform="rotate(75 151 116)"/>
+    <ellipse cx="140" cy="150" rx="5.5" ry="3" transform="rotate(-5 140 150)"/>
+  </g>
+
+  <!-- curved title text -->
+  <text font-family="'Outfit', sans-serif" font-weight="700" font-size="19" fill="#FFFFFF" letter-spacing="3">
+    <textPath href="#arcTop" startOffset="50%" text-anchor="middle">CIAO</textPath>
+  </text>
+  <text font-family="'Outfit', sans-serif" font-weight="700" font-size="16" fill="#FFFFFF" letter-spacing="5">
+    <textPath href="#arcBottom" startOffset="50%" text-anchor="middle">IRENE</textPath>
+  </text>
+
+  <!-- central monogram: I with a Stellone d'Italia star as the dot -->
+  <g transform="translate(100,108)">
+    <rect x="-7" y="-6" width="14" height="46" rx="4" fill="#FFFFFF"/>
+    <!-- five point star (stellone d'italia) -->
+    <path d="M 0,-42 L 5.9,-25.9 23,-25.4 9.4,-14.9 14.1,1.6 0,-8.3 -14.1,1.6 -9.4,-14.9 -23,-25.4 -5.9,-25.9 Z"
+          fill="url(#starGrad)" stroke="#0F0F1A" stroke-width="1"/>
+  </g>
+</svg>
